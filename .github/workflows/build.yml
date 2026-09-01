@@ -18,4 +18,29 @@ jobs:
           distribution: temurin
           java-version: "11"      # siehe .mise.toml — source/target 7
           cache: maven
+
+      # Der SBOM-Schritt (spec.md §5) hängt am package-Ziel: CycloneDX entsteht
+      # im SELBEN Lauf und aus denselben Quellen wie das Artefakt.
       - run: mvn -B verify
+
+      # Datei zuerst in die dauerhafte Ablage, danach der Upload. Widersprechen
+      # sich beide, gewinnt die Datei — sie ist das Archiv, DT nur die
+      # Abfrageschicht darüber (spec.md §5).
+      - name: SBOM sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: target/bom.json
+          retention-days: 90
+          if-no-files-found: error   # Upload ok, Datei fehlt -> Fehler
+
+      # Die Surefire-XML sind die Eingabe des Testintegritäts-Tors (spec.md §13).
+      - name: Testbericht sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: "**/target/surefire-reports/TEST-*.xml"
+          retention-days: 30
+          if-no-files-found: ignore   # dvja hat (noch) keine Tests

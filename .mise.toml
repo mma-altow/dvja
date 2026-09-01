@@ -1,0 +1,6 @@
+# JDK im Fork festgenagelt (mvp.md §6, E9-Risiko 1): dvja stammt aus der
+# Java-7-Ära. JDK 21 lehnt source/target 7 ab ("no longer supported"),
+# JDK 11 baut es grün. Nicht das nehmen, was auf dem Runner zufällig liegt.
+[tools]
+java = "temurin-11"
+maven = "3.9"

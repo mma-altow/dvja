@@ -1,0 +1,56 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Pilot-Konfiguration. Kanonische Fassung: renovate/renovate.json in mma-altow/c1-security-compliance — hier kopiert, weil das Renovate-Token nur auf die Fork-Repos gescoped ist und das private Preset-Repo nicht lesen kann (404). Sobald der Token beide sieht, wird das hier zu einem extends.",
+  "extends": [
+    "config:recommended"
+  ],
+  "//dependencyDashboard": "Auf Azure DevOps laut Zielbild nicht vorhanden; im Piloten hilfreich.",
+  "dependencyDashboard": true,
+  "//rebaseWhen": "PFLICHT (spec.md §11.3, V12): sonst überschreibt der nächste Lauf die Branch des Migrations-Agenten, der auf DIESELBE Branch schreibt.",
+  "rebaseWhen": "never",
+  "//automerge": "Ausdrücklich aus, nicht bloß ungesetzt (spec.md §9). Keine Automerge-Klasse, auch nicht für Test-Abhängigkeiten.",
+  "automerge": false,
+  "//prConcurrentLimit": "Aktualitätsupdates: fünf gleichzeitig (spec.md §9). Sicherheits-PRs heben das unten ausdrücklich auf.",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 0,
+  "//minimumReleaseAge": "Im Piloten und auf dem Entwicklungszweig wartet ein Sicherheitsfix auf niemanden (spec.md §13). Auf eingefrorenen Linien kehrt das Mindestalter zurück.",
+  "//labels": "Der Reconciler erkennt die Klasse am Label (spec.md §10, zwei Schreibklassen).",
+  "labels": [
+    "dependencies",
+    "manifest-klasse"
+  ],
+  "//separateMinorPatch": "Damit Patch- und Minor-Sprünge unterscheidbar bleiben — die Leiter aus §7 braucht das.",
+  "separateMinorPatch": true,
+  "vulnerabilityAlerts": {
+    "//": "Sicherheits-PRs: KEINE Obergrenze. 'Security umgeht das Limit' war Dependabot-Verhalten und gilt bei Renovate nicht von selbst — wird die Ausnahme nicht gesetzt, deckelt prConcurrentLimit genau die Klasse, die nicht gedeckelt werden darf, und die Lücke wird still (spec.md §9).",
+    "enabled": true,
+    "prConcurrentLimit": 0,
+    "prHourlyLimit": 0,
+    "labels": [
+      "dependencies",
+      "manifest-klasse",
+      "security"
+    ],
+    "minimumReleaseAge": null
+  },
+  "packageRules": [
+    {
+      "//": "Kontext A (Pilot): Aktualitätsupdates sind AN — rein schwachstellengetriebene Updates heben auf die kleinste schließende Version, daraus entstehen fast keine Major-Sprünge und der Migrations-Agent hätte kein Material. Pilot-Eigenschaft, keine Produkteigenschaft (spec.md §9).",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Aktualität (gruppiert)",
+      "schedule": [
+        "before 6am on monday"
+      ]
+    },
+    {
+      "//": "Major einzeln, nie gruppiert — jeder Major ist eine eigene Entscheidung.",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": null
+    }
+  ]
+}
